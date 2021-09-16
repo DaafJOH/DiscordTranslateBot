@@ -1,7 +1,7 @@
 import discord, csv, re, io
 from discord.ext import commands
 
-filePath = '/home/doe040/Daaf/Vykeen/vykeen.txt'
+filePath = 'Path here'
 
 try:
     file = open(filePath, "r")
