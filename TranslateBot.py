@@ -1,57 +1,54 @@
-import discord, csv, re, io
+import re
 from discord.ext import commands
 
-filePath = 'Path here'
-
-try:
-    file = open(filePath, "r")
-    rip = file.read()
-    file.close()
+try: #import 'gek.txt' as GEK
+    with open("gek.txt", "r") as file: GEK = file.read()
 except FileNotFoundError:
-    print("File not found. Please double check path.")
+    print("Could not find 'gek.txt' in given folder")
     exit()
 
-def Translate(sentence):
-    Tsentence = ""
-    sentence = sentence.split(" ")
-    for word in sentence:
-        Tword = ""
-        word = re.sub(r"\W|\d", "", word)
-        word = word.lower()
-        if (word != ""):
-            if (re.search(r"\d+\s+"+word+r"\s+\w+\s+\w+", rip)):
-                Tword = re.search(r"\s"+word+r"\s+\w+\s+\w+", rip)
-                Tword = re.sub(r"\s\w+\s+\w+\s+", "", Tword.group())
-                Tsentence = Tsentence + Tword + " "
-            else:
-                Tsentence = Tsentence + word + " "
-    if (Tsentence != ""):
-        return(Tsentence)
-    else:
-        return("Please enter a valid sentence to translate.")
+try: #import 'korvax.txt' as KORVAX
+    with open("korvax.txt", "r") as file: KORVAX = file.read()
+except FileNotFoundError:
+    print("Could not find 'korvax.txt' in given folder")
+    exit()
 
-def RTranslate(sentence):
-    RTsentence = ""
-    sentence = sentence.split(" ")
-    for word in sentence:
-        RTword = ""
-        word = re.sub(r"\W|\d", "", word)
-        word = word.lower()
-        if (word != ""):
-            if (re.search(r"\d+\s+\w+\s+\w+\s+"+word+"\s", rip, re.IGNORECASE)):
-                RTword = re.search(r"\d+\s+\w+\s+\w+\s+"+word+"\s", rip, re.IGNORECASE)
-                RTword = re.sub(r"\d+\s+|\s+\w+\s+\w+\s", "", RTword.group())
-                RTsentence = RTsentence + RTword + " "
-            elif (re.search(r"\d+\s+\w+\s+"+word+"\s", rip, re.IGNORECASE)):
-                RTword = re.search(r"\d+\s+\w+\s+"+word+"\s", rip, re.IGNORECASE)
-                RTword = re.sub(r"\d+\s+|\s+\w+\s", "", RTword.group())
-                RTsentence = RTsentence + RTword + " "
-            else:
-                RTsentence = RTsentence + word + " "
-    if (RTsentence != ""):
-        return(RTsentence)
-    else:
-        return("Please enter a valid sentence to translate.")
+try: #import 'vykeen.txt' as VYKEEN
+    with open("vykeen.txt", "r") as file: VYKEEN = file.read()
+except FileNotFoundError:
+    print("Could not find 'vykeen.txt' in given folder")
+    exit()
+
+def Translate(language, sentence):
+    Tsentence = ""
+    sentenceList = sentence.split(" ")
+    for word in sentenceList:
+        Tword = ""
+        word = re.sub(r"\W|\d", "", word).lower()
+        if word != "":
+            if re.search(r"\d+\s+"+word+r"\s+\w+\s+\w+", language):
+                Tword = re.sub(r"\s\w+\s+\w+\s+", "", re.search(r"\s"+word+r"\s+\w+\s+\w+", language).group())
+                Tsentence += Tword + " "
+            else: Tsentence += word + " "
+    if Tsentence != "": return(Tsentence)
+    else: return("Please enter a valid sentence to translate.")
+
+def Reverse_Translate(language, sentence):
+    Tsentence = ""
+    sentenceList = sentence.split(" ")
+    for word in sentenceList:
+        Tword = ""
+        word = re.sub(r"\W|\d", "", word).lower()
+        if word != "":
+            if re.search(r"\d+\s+\w+\s+\w+\s+"+word+"\s", language, re.IGNORECASE):
+                Tword = re.sub(r"\d+\s+|\s+\w+\s+\w+\s", "", re.search(r"\d+\s+\w+\s+\w+\s+"+word+"\s", language, re.IGNORECASE).group())
+                Tsentence += Tword + " "
+            elif re.search(r"\d+\s+\w+\s+"+word+"\s", language, re.IGNORECASE):
+                Tword = re.sub(r"\d+\s+|\s+\w+\s", "", re.search(r"\d+\s+\w+\s+"+word+"\s", language, re.IGNORECASE).group())
+                Tsentence += Tword + " "
+            else: Tsentence += word + " "
+    if Tsentence != "": return(Tsentence)
+    else: return("Please enter a valid sentence to translate.")
 
 bot = commands.Bot(command_prefix = '!')
 
@@ -59,14 +56,31 @@ bot = commands.Bot(command_prefix = '!')
 async def on_ready():
     print("Bot online")
 
-@bot.command(aliases=['Grah!', 'grah', 'grah!'])
-async def Grah(ctx, *, sentence):
-    response = Translate(sentence)
-    await ctx.send(response)
 
-@bot.command(aliases=['Gruh?', 'gruh?', 'gruh'])
-async def Gruh(ctx, *, sentence):
-    response = RTranslate(sentence)
-    await ctx.send(response)
+@bot.command(aliases=['gek'])
+async def Gek(ctx, *, sentence):
+    await ctx.send(Translate(GEK, sentence))
+
+@bot.command(aliases=['korvax'])
+async def Korvax(ctx, *, sentence):
+    await ctx.send(Translate(KORVAX, sentence))
+
+@bot.command(aliases=['vykeen', 'grah', 'Grah'])
+async def Vykeen(ctx, *, sentence):
+    await ctx.send(Translate(VYKEEN, sentence))
+
+
+@bot.command(aliases=['gektoenglish'])
+async def GekToEnglish(ctx, *, sentence):
+    await ctx.send(Reverse_Translate(GEK, sentence))
+
+@bot.command(aliases=['korvaxtoenglish'])
+async def KorvaxToEnglish(ctx, *, sentence):
+    await ctx.send(Reverse_Translate(KORVAX, sentence))
+
+@bot.command(aliases=['vykeentoenglish', 'gruh', 'Gruh'])
+async def VykeenToEnglish(ctx, *, sentence):
+    await ctx.send(Reverse_Translate(VYKEEN, sentence))
+
 
 bot.run("Bot token here")
